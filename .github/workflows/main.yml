@@ -76,6 +76,7 @@ jobs:
           for element in ${array_files[@]}
           do
           mv $element final_out/
+          done
           # echo "::set-output name=num::${#array_files[@]}"
           # for ((index=1;index<=${#array_files[@]};index++))
           # do 
