@@ -73,7 +73,7 @@ jobs:
         shell: bash
         run: |
           mapfile array_files < <(find out -name "*.ko")
-          echo "::set-output name=files::${array_files[@]}"
+          echo "::set-output name=files::${array_files[*]}"
 
       - name:   debug 
         run: |
