@@ -70,6 +70,7 @@ jobs:
           make O=out -j8 modules
       - name: Get release files name
         id: out-files
+        shell: bash
         run: |
           mapfile  array_files < <(find out -name "*.ko")
           mkdir final_out
