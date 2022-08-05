@@ -72,12 +72,21 @@ jobs:
         id: out-files
         shell: bash
         run: |
-          mapfile array_files < <(find out -name "*.ko")
-          echo "::set-output name=files::${array_files[*]}"
+          mapfile -O 1 array_files < <(find out -name "*.ko")
+          echo "::set-output name=files::${array_files[@]}"
+          # echo "::set-output name=num::${#array_files[@]}"
+          # for ((index=1;index<=${#array_files[@]};index++))
+          # do 
+          # echo "::set-output name=file${$index}::${array_files[$index]}"
+          # done
+        with_item:
+          ${ steps.out-files.outputs.files }
+
+
 
       - name:   debug 
         run: |
-          echo ${{ steps.out-files.outputs.files }}
+          echo "${{ item }}"
 
           #      - name: 
           #        uses: "marvinpinto/action-automatic-releases@latest"
