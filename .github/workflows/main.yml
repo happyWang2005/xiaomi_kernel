@@ -1,0 +1,93 @@
+
+name: CI
+
+on:
+  push:
+    branches: [ "test" ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/anyakichi/aosp-builder:14.04
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.github_token }}
+
+    steps:
+
+      - uses: actions/checkout@v3
+        with: 
+          repository: 'MiCode/Xiaomi_Kernel_OpenSource'
+          ref: latte-l-oss
+          fetch-depth: '1'
+
+      - uses: actions/checkout@v3
+        with:
+          ref: test
+          path: repo
+
+      - name: Clone  tools
+        uses: actions/checkout@v3
+        with: 
+          repository: 'Zenfone2-Dev/x86_64-linux-android-4.9'
+          path: x86_64-linux-android-4.9
+
+      - name: (Debug)Output build env
+        run: |
+          ls
+          echo
+          ls x86_64-linux-android-4.9
+          echo
+          ls x86_64-linux-android-4.9/bin
+          echo
+          ls /lib64/ld-linux-x86-64.so.2
+          ls /lib/x86_64-linux-gnu/libm.so.6
+          ls /lib/x86_64-linux-gnu/libc.so.6
+          echo
+          ls /etc/ld.so.conf.d/*
+
+
+      - name: Fix
+        run: |
+          ln -s $PWD/x86_64-linux-android-4.9/bin/* /usr/bin/
+          sed -i '381 a -fno-pie\\' Makefile
+          
+
+      - name: Build
+        run: |
+          export ARCH=x86_64
+          export SUBARCH=x86_64
+          export PATH=$PATH:$PWD/x86_64-linux-android-4.9/bin/
+          export CROSS_COMPILE=x86_64-linux-android-
+
+
+          mkdir out
+          cp repo/config out/.config
+
+          make O=out -j8 modules
+      - name: Get release files name
+        id: out-files
+        shell: bash
+        run: |
+          mapfile array_files < <(find out -name "*.ko")
+          echo "::set-output name=files::${array_files[@]}"
+
+      - name:   debug 
+        run: |
+          echo ${{ steps.out-files.outputs.files }}
+
+          #      - name: 
+          #        uses: "marvinpinto/action-automatic-releases@latest"
+          #        with:
+          #          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          #          automatic_release_tag: lastest
+          #          files: |
+          #            ${{ steps.out-files.outputs.files }}
+
+
+
+
+
