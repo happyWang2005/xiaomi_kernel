@@ -81,8 +81,6 @@ jobs:
           # do 
           # echo "::set-output name=file${$index}::${array_files[$index]}"
           # done
-        with_item:
-          ${ steps.out-files.outputs.files }
 
 
 
