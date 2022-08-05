@@ -70,10 +70,12 @@ jobs:
           make O=out -j8 modules
       - name: Get release files name
         id: out-files
-        shell: bash
         run: |
-          mapfile -O 1 array_files < <(find out -name "*.ko")
-          echo "::set-output name=files::${array_files[@]}"
+          mapfile  array_files < <(find out -name "*.ko")
+          mkdir final_out
+          for element in ${array_files[@]}
+          do
+          mv $element final_out/
           # echo "::set-output name=num::${#array_files[@]}"
           # for ((index=1;index<=${#array_files[@]};index++))
           # do 
@@ -84,17 +86,17 @@ jobs:
 
 
 
-      - name:   debug 
-        run: |
-          echo "${{ item }}"
+          #      - name:   debug 
+          #        run: |
+          
 
-          #      - name: 
-          #        uses: "marvinpinto/action-automatic-releases@latest"
-          #        with:
-          #          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          #          automatic_release_tag: lastest
-          #          files: |
-          #            ${{ steps.out-files.outputs.files }}
+      - name: 
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: lastest
+          files: |
+            final_out/*
 
 
 
