@@ -21,7 +21,7 @@ jobs:
       SUBARCH: arm64
       ARCH_ALIAS: aarch64
     env:  
-      CROSS_COMPILE: ${{ env.ARCH_ALIAS }}'-linux-android-'
+      CROSS_COMPILE: ${{ github.env.ARCH_ALIAS }}'-linux-android-'
 
     steps:
 
