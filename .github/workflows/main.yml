@@ -2,8 +2,8 @@
 name: CI
 
 on:
-  #  push:
-  #    branches: [ "test" ]
+    push:
+      branches: [ ${{ github.ref_name }} ]
 
   workflow_dispatch:
 
@@ -16,10 +16,10 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     env:
-      DEV_NAME: 
-      ARCH: 
-      SUBARCH: 
-      ARCH_ALIAS: 
+      DEV_NAME: ${{ github.ref_name }}
+      ARCH: arm64
+      SUBARCH: arm64
+      ARCH_ALIAS: aarch64
 
     steps:
 
@@ -31,8 +31,7 @@ jobs:
       - name: Fetch kernel source
         uses: actions/checkout@v3
         with: 
-          repository: 'MiCode/Xiaomi_Kernel_OpenSource'
-          ref: latte-l-oss
+          repository: 'MT6797/kernel-3.18'
 
       - name: Fetch config file
         uses: actions/checkout@v3
@@ -43,7 +42,7 @@ jobs:
       - name: Clone compile tools
         uses: actions/checkout@v3
         with: 
-          repository: ''
+          repository: 'LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9'
           path: ${{ env.CROSS_COMPILE }}
 
       - name: Fix
