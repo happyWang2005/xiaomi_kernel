@@ -16,12 +16,12 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
     env:
-      DEV_NAME: nikel
+      DEV_NAME: ${{ github.ref_name }}
       ARCH: arm64
       SUBARCH: arm64
       ARCH_ALIAS: aarch64
-    env:
-      CROSS_COMPILE: ${{ env.ARCH_ALIAS }}-linux-android-
+    env:  
+      CROSS_COMPILE: ${{ env.ARCH_ALIAS }}'-linux-android-'
 
     steps:
 
