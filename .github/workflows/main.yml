@@ -26,6 +26,8 @@ jobs:
         run: |
           echo "CROSS_COMPILE=${{ env.ARCH_ALIAS }}-linux-android-" >> $GITHUB_ENV
           echo "$CROSS_COMPILE/bin" >> $GITHUB_PATH
+          echo "$PATH"
+          ls $CROSS_COMPILE/bin
 
       - name: Fetch kernel source
         uses: actions/checkout@v3
