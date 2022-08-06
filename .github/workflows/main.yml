@@ -3,7 +3,7 @@ name: CI
 
 on:
     push:
-      branches: [ ${{ github.ref }} ]
+      branches: [ "${{ github.ref }}" ]
 
   workflow_dispatch:
 
