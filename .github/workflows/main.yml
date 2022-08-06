@@ -25,13 +25,6 @@ jobs:
       - name: Set environment variable
         run: |
           echo "CROSS_COMPILE=${{ env.ARCH_ALIAS }}-linux-android-" >> $GITHUB_ENV
-          echo "${{ github.workspace }}/${{ env.CROSS_COMPILE }}/bin" >> $GITHUB_PATH
-
-          echo "$PATH"
-          echo
-          ls $CROSS_COMPILE/bin
-          echo
-          env
 
       - name: Fetch kernel source
         uses: actions/checkout@v3
@@ -50,15 +43,9 @@ jobs:
           repository: 'LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9'
           path: ${{ env.CROSS_COMPILE }}
 
-      - name: Set environment variable
+      - name: Add compiler to PATH
         run: |
-          echo "CROSS_COMPILE=${{ env.ARCH_ALIAS }}-linux-android-" >> $GITHUB_ENV
-          echo "${{ github.workspace }}/${{ env.CROSS_COMPILE }}/bin" >> $GITHUB_PATH
-          echo "$PATH"
-          ls $CROSS_COMPILE/bin
-          echo
-          env
-
+          ln -s $PWD/${{ env.CROSS_COMPILE }}/bin/* /bin/
 
       - name: Build
         run: |
