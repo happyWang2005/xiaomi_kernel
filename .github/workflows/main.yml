@@ -50,7 +50,7 @@ jobs:
       - name: Build
         run: |
           mkdir out
-          cp repo/kernelconfig out/.config
+          cp configs/kernelconfig out/.config
 
           make O=out -j8 modules
 
@@ -61,7 +61,7 @@ jobs:
           mkdir releases
           for element in ${array_files[@]}
           do
-          mv $element final_out/
+          mv $element releases/
           done
 
       - name: Releases Files 
