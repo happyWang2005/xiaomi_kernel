@@ -20,7 +20,7 @@ jobs:
       ARCH: arm64
       SUBARCH: arm64
       ARCH_ALIAS: aarch64
-      CROSS_COMPILE: ${{ env.ARCH_ALIAS }}-linux-android-
+      CROSS_COMPILE: $ARCH_ALIAS-linux-android-
 
     steps:
 
