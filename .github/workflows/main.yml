@@ -15,14 +15,18 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
+    env:
+      DEV_NAME: nikel
+      ARCH: arm64
+      SUBARCH: arm64
+      ARCH_ALIAS: aarch64
+      CROSS_COMPILE: ${{ env.ARCH_ALIAS }}-linux-android-
 
     steps:
 
       - uses: actions/checkout@v3
         with: 
-          repository: 'MiCode/Xiaomi_Kernel_OpenSource'
-          ref: latte-l-oss
-          fetch-depth: '1'
+          repository: 'MT6797/kernel-3.18'
 
       - uses: actions/checkout@v3
         with:
@@ -32,37 +36,32 @@ jobs:
       - name: Clone  tools
         uses: actions/checkout@v3
         with: 
-          repository: 'Zenfone2-Dev/x86_64-linux-android-4.9'
-          path: x86_64-linux-android-4.9
+          repository: 'LineageOS/android_prebuilts_gcc_linux-x86_aarch64_aarch64-linux-android-4.9'
+          path: ${{ env.CROSS_COMPILE }}
 
       - name: (Debug)Output build env
         run: |
           ls
           echo
-          ls x86_64-linux-android-4.9
+          ls ${{ env.CROSS_COMPILE }}
           echo
-          ls x86_64-linux-android-4.9/bin
+          ls ${{ env.CROSS_COMPILE }}/bin
           echo
-          ls /lib64/ld-linux-x86-64.so.2
-          ls /lib/x86_64-linux-gnu/libm.so.6
-          ls /lib/x86_64-linux-gnu/libc.so.6
+          ls /lib64/ld-linux-${{ env.ARCH }}.so.2
+          ls /lib/${{ env.ARCH }}-linux-gnu/libm.so.6
+          ls /lib/${{ env.ARCH }}-linux-gnu/libc.so.6
           echo
           ls /etc/ld.so.conf.d/*
 
 
       - name: Fix
         run: |
-          ln -s $PWD/x86_64-linux-android-4.9/bin/* /usr/bin/
-          sed -i '381 a -fno-pie\\' Makefile
+          ln -s $PWD/${{ env.CROSS_COMPILE }}/bin/* /usr/bin/
+          #sed -i '381 a -fno-pie\\' Makefile
           
 
       - name: Build
         run: |
-          export ARCH=x86_64
-          export SUBARCH=x86_64
-          export PATH=$PATH:$PWD/x86_64-linux-android-4.9/bin/
-          export CROSS_COMPILE=x86_64-linux-android-
-
 
           mkdir out
           cp repo/config out/.config
@@ -78,13 +77,6 @@ jobs:
           do
           mv $element final_out/
           done
-          # echo "::set-output name=num::${#array_files[@]}"
-          # for ((index=1;index<=${#array_files[@]};index++))
-          # do 
-          # echo "::set-output name=file${$index}::${array_files[$index]}"
-          # done
-
-
 
           #      - name:   debug 
           #        run: |
@@ -94,7 +86,7 @@ jobs:
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: lastest
+          automatic_release_tag: ${{ env.DEV_NAME }}-lastest
           files: |
             final_out/*
 
