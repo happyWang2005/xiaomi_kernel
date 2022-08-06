@@ -20,9 +20,13 @@ jobs:
       ARCH: 
       SUBARCH: 
       ARCH_ALIAS: 
-      CROSS_COMPILE: ${{ env.ARCH_ALIAS }}-linux-android-
 
     steps:
+
+      - name: Set environment variable
+        run: |
+          echo "CROSS_COMPILE=${{ env.ARCH_ALIAS }}-linux-android-" >> $GITHUB_ENV
+          echo "$CROSS_COMPILE/bin" >> $GITHUB_PATH
 
       - name: Fetch kernel source
         uses: actions/checkout@v3
@@ -33,8 +37,8 @@ jobs:
       - name: Fetch config file
         uses: actions/checkout@v3
         with:
-          ref: test
-          path: repo
+          ref: ${{ github.ref_name }}
+          path: configs
 
       - name: Clone compile tools
         uses: actions/checkout@v3
@@ -44,32 +48,27 @@ jobs:
 
       - name: Fix
         run: |
-          ln -s $PWD/x86_64-linux-android-4.9/bin/* /usr/bin/
-          sed -i '381 a -fno-pie\\' Makefile
-          
 
       - name: Build
         run: |
           mkdir out
-          cp repo/config out/.config
+          cp repo/kernelconfig out/.config
 
           make O=out -j8 modules
 
       - name: Get release files name
-        id: out-files
         shell: bash
         run: |
           mapfile  array_files < <(find out -name "*.ko")
-          mkdir final_out
+          mkdir releases
           for element in ${array_files[@]}
           do
           mv $element final_out/
           done
 
-      - name: 
+      - name: Releases Files 
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: ${{ env.DEV_NAME }}-lastest
-          files: |
-            final_out/*
+          files: releases/*
