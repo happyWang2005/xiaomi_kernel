@@ -15,40 +15,32 @@ jobs:
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.github_token }}
+    env:
+      DEV_NAME: 
+      ARCH: 
+      SUBARCH: 
+      ARCH_ALIAS: 
+      CROSS_COMPILE: ${{ env.ARCH_ALIAS }}-linux-android-
 
     steps:
 
-      - uses: actions/checkout@v3
+      - name: Fetch kernel source
+        uses: actions/checkout@v3
         with: 
           repository: 'MiCode/Xiaomi_Kernel_OpenSource'
           ref: latte-l-oss
-          fetch-depth: '1'
 
-      - uses: actions/checkout@v3
+      - name: Fetch config file
+        uses: actions/checkout@v3
         with:
           ref: test
           path: repo
 
-      - name: Clone  tools
+      - name: Clone compile tools
         uses: actions/checkout@v3
         with: 
-          repository: 'Zenfone2-Dev/x86_64-linux-android-4.9'
-          path: x86_64-linux-android-4.9
-
-      - name: (Debug)Output build env
-        run: |
-          ls
-          echo
-          ls x86_64-linux-android-4.9
-          echo
-          ls x86_64-linux-android-4.9/bin
-          echo
-          ls /lib64/ld-linux-x86-64.so.2
-          ls /lib/x86_64-linux-gnu/libm.so.6
-          ls /lib/x86_64-linux-gnu/libc.so.6
-          echo
-          ls /etc/ld.so.conf.d/*
-
+          repository: ''
+          path: ${{ env.CROSS_COMPILE }}
 
       - name: Fix
         run: |
@@ -58,16 +50,11 @@ jobs:
 
       - name: Build
         run: |
-          export ARCH=x86_64
-          export SUBARCH=x86_64
-          export PATH=$PATH:$PWD/x86_64-linux-android-4.9/bin/
-          export CROSS_COMPILE=x86_64-linux-android-
-
-
           mkdir out
           cp repo/config out/.config
 
           make O=out -j8 modules
+
       - name: Get release files name
         id: out-files
         shell: bash
@@ -78,27 +65,11 @@ jobs:
           do
           mv $element final_out/
           done
-          # echo "::set-output name=num::${#array_files[@]}"
-          # for ((index=1;index<=${#array_files[@]};index++))
-          # do 
-          # echo "::set-output name=file${$index}::${array_files[$index]}"
-          # done
-
-
-
-          #      - name:   debug 
-          #        run: |
-          
 
       - name: 
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: lastest
+          automatic_release_tag: ${{ env.DEV_NAME }}-lastest
           files: |
             final_out/*
-
-
-
-
-
